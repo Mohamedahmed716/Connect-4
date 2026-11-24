@@ -1,0 +1,10 @@
+K,algorithm,total_nodes,avg_nodes_per_move,total_time_s,avg_time_per_move_s
+1,alpha-beta,125,6.0,0.005,0.0002
+1,plain,125,6.0,0.004,0.0002
+2,alpha-beta,417,19.9,0.01,0.0005
+2,plain,742,35.3,0.02,0.001
+3,alpha-beta,1505,71.7,0.037,0.0018
+3,plain,4102,195.3,0.111,0.0053
+4,alpha-beta,6162,293.4,0.143,0.0068
+4,plain,28829,1372.8,0.773,0.0368
+5,alpha-beta,14940,711.4,0.337,0.016

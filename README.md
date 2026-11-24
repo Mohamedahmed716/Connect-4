@@ -1,32 +1,53 @@
-# Connect 4 - Minimax with Alpha-Beta (AI Assignment 2)
+# Connect 4 - Minimax with Alpha-Beta Pruning (AI Assignment 2)
 
-Board is 7 columns x 6 rows. Human = X / red, AI = O / yellow.
-The game continues until the board is full, the winner has more connected-fours.
+Human vs computer Connect 4 on a 7 columns x 6 rows board.
+Human = X / red (plays first), AI = O / yellow.
+The game continues until the board is full; the player with more connected-fours wins.
 
 ## Run
-    python3 gui.py          (tkinter window, needs python3-tk on Linux)
-    python3 console.py      (Member 2 has to finish it)
-    python3 benchmark.py    (K = 1..5, writes benchmark_results.csv)
+    python3 console.py      # console game (asks for K, prints board + minimax tree every turn)
+    python3 gui.py          # tkinter GUI (needs python3-tk on Linux), K spin box + tree panel
+    python3 benchmark.py    # K = 1..5, alpha-beta vs plain minimax, writes benchmark_results.csv
+
+Only the Python 3 standard library is used.
 
 ## Files
-| File | Status | What it does |
-|------|--------|--------------|
-| board.py | DONE | board, drop piece, valid moves (center first), count fours, board text |
-| minimax.py | DONE | minimax + alpha-beta, K-depth cutoff, tree printing with alpha/beta, pruned cols, leaf heuristic values and boards, nodes + time |
-| gui.py | DONE | GUI with K spinbox, click to play, scores, tree panel, nodes/time. Full tree is also printed to console and saved in tree_log.txt |
-| benchmark.py | DONE | AI vs random player, nodes and time per K, with and without pruning |
-| heuristic.py | MEMBER 2 | placeholder only (score difference). Real heuristic must be designed here |
-| console.py | MEMBER 2 | only a skeleton, console game loop is missing |
-| Report | MEMBER 2 | not started |
+| File | What it does |
+|------|--------------|
+| board.py | board (list of lists), drop piece, valid moves (centre first), windows of 4, count fours, board as text |
+| minimax.py | minimax + alpha-beta, K-depth cut-off, tree printing (alpha/beta, pruned columns, leaf heuristic values and boards), node count and time |
+| heuristic.py | heuristic evaluation of a board (see below) |
+| console.py | console version of the game |
+| gui.py | GUI (bonus): click to play, scores, K spin box, tree panel, nodes/time; full trees saved to tree_log.txt |
+| benchmark.py | AI vs random player, nodes and time for each K, with and without pruning |
+| report.tex / report.pdf | the report |
 
-## Member 2 checklist
-1. heuristic.py - design the real heuristic (bonus for best 3). Use current scores, open 3s and 2s, center control, candidate cells. Keep it fast because it runs on every leaf.
-2. console.py - ask for K, play the game, print board and tree every turn.
-3. Run benchmark.py again after the heuristic is done and use benchmark_results.csv in the report.
-4. Report: sample runs with their trees, time and nodes table for different K (pruning vs plain), data structures (list of lists board, list of strings for tree), algorithm explanation, heuristic explanation, assumptions, extra work (GUI + tree panel).
-5. Before submitting add comments to the code, the assignment asks for well commented code.
+## Algorithm
+- AI = MAX, human = MIN. The search stops at depth K and evaluates the leaf with the heuristic.
+- A full board is scored as (AI fours - human fours) * 1000, so real results always beat heuristic values.
+- Alpha-beta cuts the remaining columns when alpha >= beta; pruned columns are printed in the tree.
+- Columns are tried centre-first to get more cut-offs.
+
+## Heuristic (heuristic.py)
+One pass over the 69 windows of 4 cells. A window with discs of only one player is a possible future four for that player.
+
+| Feature | AI | Human |
+|---------|----|-------|
+| completed four | +100 | -100 |
+| 3 discs + 1 empty | +10 | -12 |
+| 2 discs + 2 empty | +3 | -4 |
+| disc in centre column | +4 | -4 |
+
+Windows containing both players' discs are ignored. Human threats weigh slightly more, which makes the AI a bit defensive.
+
+## Tree format
+    col 3 MIN value=-25 alpha=-inf beta=-25    internal node (value, alpha, beta when finished)
+    col 4 LEAF h=-25                           leaf: heuristic value (+ board if enabled)
+    col 2 FULL h=1000                          full board: real score * 1000
+    pruned cols [2, 4, 1]                      columns skipped by alpha-beta
 
 ## Assumptions
-- A line of 5 or more discs counts as more than one four (every window of 4 is counted).
 - Human always plays first.
-- Full board value is (AI fours - human fours) * 1000, so real results beat heuristic values.
+- A line of 5 or more discs counts as more than one four (every window of 4 is counted).
+- The game ends only when the board is full.
+- Equal number of fours = draw.
